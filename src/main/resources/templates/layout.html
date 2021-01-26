@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<!--suppress ALL-->
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>RedisStats | [[${Nav_Current_Node.name}]]</title>
+
+	<!-- Google Font: Source Sans Pro -->
+	<link rel="stylesheet" href="/static/css/css.css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+	<!-- Font Awesome -->
+	<link rel="stylesheet" href="/static/AdminLTE-3.1.0-rc/plugins/fontawesome-free/css/all.min.css">
+	<!-- Ionicons -->
+	<link rel="stylesheet" href="/static/ionicons/ionicons.min.css">
+	<!-- Tempusdominus Bootstrap 4 -->
+	<link rel="stylesheet" href="/static/AdminLTE-3.1.0-rc/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
+	<!-- iCheck -->
+	<link rel="stylesheet" href="/static/AdminLTE-3.1.0-rc/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+	<!-- JQVMap -->
+	<link rel="stylesheet" href="/static/AdminLTE-3.1.0-rc/plugins/jqvmap/jqvmap.min.css">
+	<!-- Theme style -->
+	<link rel="stylesheet" href="/static/AdminLTE-3.1.0-rc/dist/css/adminlte.min.css">
+	<!-- overlayScrollbars -->
+	<link rel="stylesheet" href="/static/AdminLTE-3.1.0-rc/plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
+	<!-- Daterange picker -->
+	<link rel="stylesheet" href="/static/AdminLTE-3.1.0-rc/plugins/daterangepicker/daterangepicker.css">
+	<!-- summernote -->
+	<link rel="stylesheet" href="/static/AdminLTE-3.1.0-rc/plugins/summernote/summernote-bs4.min.css">
+	<link rel="stylesheet" href="/static/css/base.css" />
+
+	<!-- SweetAlert2 -->
+	<link rel="stylesheet" href="/static/AdminLTE-3.1.0-rc/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css">
+	<!-- Toastr -->
+	<link rel="stylesheet" href="/static/AdminLTE-3.1.0-rc/plugins/toastr/toastr.min.css">
+</head>
+<body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
+
+<!-- jQuery -->
+<script src="/static/AdminLTE-3.1.0-rc/plugins/jquery/jquery.min.js"></script>
+<!-- jQuery UI 1.11.4 -->
+<script src="/static/AdminLTE-3.1.0-rc/plugins/jquery-ui/jquery-ui.min.js"></script>
+<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+<script>
+	$.widget.bridge('uibutton', $.ui.button)
+</script>
+<!-- Bootstrap 4 -->
+<script src="/static/AdminLTE-3.1.0-rc/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- ChartJS -->
+<script src="/static/AdminLTE-3.1.0-rc/plugins/chart.js/Chart.min.js"></script>
+<!-- Sparkline -->
+<script src="/static/AdminLTE-3.1.0-rc/plugins/sparklines/sparkline.js"></script>
+<!-- JQVMap -->
+<script src="/static/AdminLTE-3.1.0-rc/plugins/jqvmap/jquery.vmap.min.js"></script>
+<script src="/static/AdminLTE-3.1.0-rc/plugins/jqvmap/maps/jquery.vmap.usa.js"></script>
+<!-- jQuery Knob Chart -->
+<script src="/static/AdminLTE-3.1.0-rc/plugins/jquery-knob/jquery.knob.min.js"></script>
+<!-- daterangepicker -->
+<script src="/static/AdminLTE-3.1.0-rc/plugins/moment/moment.min.js"></script>
+<script src="/static/AdminLTE-3.1.0-rc/plugins/daterangepicker/daterangepicker.js"></script>
+<!-- Tempusdominus Bootstrap 4 -->
+<script src="/static/AdminLTE-3.1.0-rc/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
+<!-- Summernote -->
+<script src="/static/AdminLTE-3.1.0-rc/plugins/summernote/summernote-bs4.min.js"></script>
+<!-- overlayScrollbars -->
+<script src="/static/AdminLTE-3.1.0-rc/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
+
+<script src="/static/AdminLTE-3.1.0-rc/plugins/sweetalert2/sweetalert2.min.js"></script>
+<script src="/static/AdminLTE-3.1.0-rc/plugins/toastr/toastr.min.js"></script>
+
+<!-- AdminLTE App -->
+<script src="/static/AdminLTE-3.1.0-rc/dist/js/adminlte.js"></script>
+<div class="wrapper">
+
+	<!-- Navbar -->
+	<nav class="main-header navbar navbar-expand navbar-white navbar-light">
+		<ul class="navbar-nav">
+			<li class="nav-item">
+				<a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+			</li>
+
+		</ul>
+
+
+		<!-- Right navbar links -->
+		<ul class="navbar-nav ml-auto">
+			<!-- Notifications Dropdown Menu -->
+
+			<li class="nav-item">
+				<a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button">
+					<i class="far fa-comments"></i>
+					<span class="badge badge-danger navbar-badge">0</span>
+
+				</a>
+			</li>
+			<li class="nav-item dropdown user-menu">
+				<a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
+					<img src="/static/AdminLTE-3.1.0-rc/dist/img/user2-160x160.jpg" class="user-image img-circle elevation-2" alt="User Image">
+					<span class="d-none d-md-inline">Admin</span>
+				</a>
+				<ul class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+					<!-- User image -->
+					<li class="user-header bg-primary">
+						<img src="/static/AdminLTE-3.1.0-rc/dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
+
+						<p>
+							Admin
+							<small id="login_time"></small>
+						</p>
+					</li>
+
+					<!-- Menu Footer-->
+					<li class="user-footer">
+						<a href="#" class="btn btn-default btn-flat">Profile</a>
+						<a href="/logout" class="btn btn-default btn-flat float-right">退出</a>
+					</li>
+				</ul>
+			</li>
+		</ul>
+	</nav>
+	<!-- /.navbar -->
+
+	<!-- Main Sidebar Container -->
+	<aside class="main-sidebar sidebar-dark-primary elevation-4">
+		<!-- Brand Logo -->
+		<a href="#" class="brand-link">
+			<img src="/logo.png" alt="RedisStats Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+			<span class="brand-text font-weight-light">RedisStats</span>
+		</a>
+
+		<!-- Sidebar -->
+		<div class="sidebar">
+			<!-- Sidebar user panel (optional) -->
+			<div class="user-panel mt-3 pb-3 mb-3 d-flex">
+				<div class="image">
+					<img src="/static/AdminLTE-3.1.0-rc/dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
+				</div>
+				<div class="info">
+					<a href="#" class="d-block">Admin </a>
+				</div>
+			</div>
+
+
+
+			<!-- Sidebar Menu -->
+			<nav class="mt-2">
+				<ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+					<!-- Add icons to the links using the .nav-icon class
+                         with font-awesome or any other icon font library -->
+
+					<li th:each="item:${NAV_TOP_NODES}" th:class="${Nav_Node_Link[0].id==item.id} ?'active nav-item' : 'nav-item'" th:classappend="${item.hasTopNavChild()} ?'treeview' : ''"   >
+						<a th:href="${item.path}" class="nav-link">
+							<i th:class="@{'nav-icon fa fa-'+${item.icon}}"></i>
+							<p>[[${item.name}]]</p>
+							<i th:if="${item.hasTopNavChild()}" class="fa fa-angle-left pull-right"></i>
+						</a>
+						<ul th:if="${item.hasTopNavChild()}" class="nav treeview-menu">
+							<li th:each="child:${item.topNavChildren}" th:classappend="${Nav_Node_Link.size()>1 && Nav_Node_Link[1].id == child.id} ?'nav-item active' : ''">
+								<a th:href="@{child.path}" class="nav-link">
+									<i th:class="@{'nav-icon fa '+fa-${child.icon}}"></i>
+									<p>[[${child.name}]]</p>
+								</a>
+							</li>
+						</ul>
+					</li>
+
+
+				</ul>
+			</nav>
+			<!-- /.sidebar-menu -->
+		</div>
+		<!-- /.sidebar -->
+	</aside>
+
+	<!-- Content Wrapper. Contains page content -->
+	<div class="content-wrapper">
+		<!-- Content Header (Page header) -->
+		<section class="content-header">
+			<ol class="breadcrumb"><li>
+				<a href="/clusters"><i class="fa fa-home"></i> 首页</a>> </li>
+				<li  th:each="item,itemStat :${Nav_Node_Link}">
+					<a th:if="${itemStat.count < Nav_Node_Link.size()}" th:href="@{${item.path}}">[[${item.name}]]</a>
+
+					<div th:if="!${itemStat.count <Nav_Node_Link.size()}">>[[${Nav_Current_Node.name}]]</div>
+				</li>
+
+			</ol>
+		</section>
+		<section layout:fragment="content"><p>Error: View doesn't display into layout !</p></section>
+
+
+	</div>
+	<!-- /.content-wrapper -->
+	<footer class="main-footer">
+		<strong>Redis Stats</strong>
+		<div class="float-right d-none d-sm-inline-block">
+			<b>Version</b> 0.0.1
+		</div>
+	</footer>
+
+	<!-- Control Sidebar -->
+	<aside class="control-sidebar control-sidebar-dark">
+		<!-- Control sidebar content goes here -->
+	</aside>
+	<!-- /.control-sidebar -->
+</div>
+<!-- ./wrapper -->
+
+</body>
+</html>

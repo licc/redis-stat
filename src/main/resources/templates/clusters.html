@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<!--suppress ALL-->
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+</head>
+<body layout:fragment="content">
+<section class="content">
+    <div class="card-header">
+        <h3 class="card-title"></h3>
+        <div class="card-tools">
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addClusterModal"
+                    onclick="values()">
+                添加集群
+            </button>
+        </div>
+    </div>
+
+
+    <div class="callout callout-normal" th:each="cluster:${clusters}">
+        <div class="card-header">
+            <h4 th:text="${cluster.name}" class="card-title"></h4>
+            <div class="card-tools">
+                <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse"
+                        data-toggle="modal" data-target="#addNodeModal" th:onclick="values('node',[[${cluster.id}]]);">
+                    <i class="fas fa-plus"></i>
+                </button>
+                <button type="button" class="btn btn-tool" data-card-widget="remove" title="Remove" data-toggle="modal"
+                        data-target="#del-cluster-confirm" th:onclick="values('del_cluster',[[${cluster.id}]]);">
+                    <i class="fas fa-times"></i>
+                </button>
+
+
+            </div>
+        </div>
+
+        <p>
+            <a th:each="node:${cluster.nodes}"
+               th:href="@{'/monitor/' + ${node.host}+':'+${node.port}}" th:switch="${node.role}"
+               class="btn btn-default btn-flat">
+                <span class="label   badge bg-primary" th:case="'master'">[[${node.role}]]</span>
+                <span class="label bg-green" th:case="*">[[${node.role}]]</span>
+                [[${node.host}]]:[[${node.port}]]
+                <button type="button" class="btn btn-tool" data-card-widget="remove" title="Remove" data-toggle="modal"
+                        data-target="#del-node-confirm" th:onclick="values('del_node',[[${node.id}]]);">
+                    <i class="fas fa-times"></i>
+                </button>
+            </a>
+        </p>
+
+        <div class="callout callout-normal" th:each="cluster:${cluster.children}">
+            <h4 th:text="${cluster.name}"></h4>
+            <p>
+                <a th:each="node:${cluster.nodes}"
+                   th:href="@{'/monitor/' + ${node.host}+':'+${node.port}}" th:switch="${node.role}"
+                   class="btn btn-default btn-flat">
+                    <span class="label   badge bg-primary" th:case="'master'">[[${node.role}]]</span>
+                    <span class="label bg-green" th:case="*">[[${node.role}]]</span>
+                    [[${node.host}]]:[[${node.port}]]
+                    <button type="button" class="btn btn-tool" data-card-widget="remove" title="Remove">
+                        <i class="fas fa-times"></i>
+                    </button>
+
+                </a>
+            </p>
+
+        </div>
+    </div>
+
+    <div class="modal fade" id="addClusterModal" tabindex="-1" role="dialog" aria-labelledby="addClusterModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="card-header">
+                    <h3 class="card-title">添加集群</h3>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="addClusterForm" class="form-horizontal" role="form">
+                        <div class="card-body">
+
+                            <div class="form-group">
+                                <label for="name">集群名称</label>
+                                <input type="text" class="form-control" name="name" placeholder="输入集群名称">
+
+                            </div>
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                            </button>
+                            <button type="submit" id="addClusterSubmitBtn" class="btn btn-primary">
+                                提交
+                            </button>
+                            <span id="tip"> </span>
+                        </div>
+                    </form>
+                </div>
+
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+    <div class="modal fade" id="addNodeModal" tabindex="-1" role="dialog" aria-labelledby="addNodeModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="card-header">
+                    <h3 class="card-title">添加实例</h3>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="addNodeForm" class="form-horizontal" role="form">
+                        <div class="card-body">
+                            <input type="hidden" name="clusterId"/>
+
+                            <div class="form-group">
+                                <label for="name">实例名称</label>
+                                <input type="text" class="form-control" name="name" placeholder="输入实例名称">
+                            </div>
+                            <div class="form-group">
+                                <label for="host">实例地址</label>
+                                <input type="text" class="form-control" name="host" placeholder="输入实例地址">
+                            </div>
+                            <div class="form-group">
+                                <label for="host">实例端口</label>
+                                <input type="number" class="form-control" name="port" placeholder="输入实例端口">
+                            </div>
+
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                            </button>
+                            <button type="submit" id="addNodeSubmitBtn" class="btn btn-primary">
+                                提交
+                            </button>
+                            <span id="tip"> </span>
+                        </div>
+                    </form>
+                </div>
+
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+
+    <!--     /.modal-dialog -->
+    </div>
+
+    <!-- /.modal -->
+
+    <div class="modal fade" id="del-cluster-confirm">
+        <div class="modal-dialog">
+            <div class="modal-content bg-danger">
+                <div class="modal-header">
+                    <h4 class="modal-title">集群删除提示</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>您确定删除该集群吗？</p>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-outline-light" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-outline-light" onclick="confirmDeleteRemoteData('cluster')">确定
+                    </button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <div class="modal fade" id="del-node-confirm">
+        <div class="modal-dialog">
+            <div class="modal-content bg-danger">
+                <div class="modal-header">
+                    <h4 class="modal-title">实例删除提示</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>您确定删除该实例吗？</p>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-outline-light" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-outline-light" onclick="confirmDeleteRemoteData('node')">确定
+                    </button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+    <!-- /.modal -->
+
+    <script src="/static/AdminLTE-3.1.0-rc/plugins/jquery-validation/jquery.validate.min.js"></script>
+    <script src="/static/AdminLTE-3.1.0-rc/plugins/jquery-validation/additional-methods.min.js"></script>
+    <script src='/static/js/jquery.serializejson.min.js'></script>
+    <script src='/static/js/clusters.js'></script>
+
+</section>
+</body>
+</html>

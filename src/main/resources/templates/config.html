@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<!--suppress ALL-->
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+
+</head>
+<body layout:fragment="content">
+
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12"><h4><i class="fa fa-hand-o-right"></i> [[${node}]]</h4></div>
+    </div>
+    <div class="box-header">
+
+
+        <div class="btn-group w-100 mb-2" style="max-width: 500px">
+            <a class="btn btn-info " th:href="@{'/monitor/'+${node}}"> 监控</a>
+            <a class="btn btn-info active " th:href="@{'/config/'+${node}}"> 配置</a>
+            <a class="btn btn-info " th:href="@{'/slowlog/'+${node}}"> SlowLog</a>
+        </div>
+
+    </div>
+    <div class="container-fluid">
+
+        <div class="card-body">
+            <table class="table table-bordered table-hover">
+                <thead>
+                <tr>
+                    <th>key</th>
+                    <th>value</th>
+
+                </tr>
+                </thead>
+                <tbody>
+
+                <tr th:each=" item: ${configs.entrySet()}" data-widget="expandable-table" aria-expanded="false">
+                    <td>[[${item.key}]]</td>
+                    <td>[[${item.value}]]</td>
+                </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+    </div><!-- /.container-fluid -->
+</section>
+
+</body>
+</html>

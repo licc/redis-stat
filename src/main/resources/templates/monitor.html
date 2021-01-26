@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<!--suppress ALL-->
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+
+</head>
+<body layout:fragment="content">
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12"><h4><i class="fa fa-hand-o-right"></i> [[${node}]]</h4></div>
+    </div>
+    <div class="box-header">
+
+        <div class="btn-group w-100 mb-2" style="max-width: 500px">
+            <a class="btn btn-info active" th:href="@{'/monitor/'+${node}}"> 监控</a>
+            <a class="btn btn-info " th:href="@{'/config/'+${node}}"> 配置</a>
+            <a class="btn btn-info " th:href="@{'/slowlog/'+${node}}"> SlowLog</a>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <!-- Small boxes (Stat box) -->
+        <div class="row">
+            <div class="col-lg-3 col-6">
+                <!-- small box -->
+                <div class="small-box bg-info">
+                    <div class="inner">
+                        <h3><span id="dbsize">--</span></h3>
+                        <p>Key数量 <span id="dbsize_expired"></span></p>
+                    </div>
+                    <div class="icon">
+                        <i class="ion ion-settings"></i>
+                    </div>
+                </div>
+            </div>
+            <!-- ./col -->
+            <div class="col-lg-3 col-6">
+                <!-- small box -->
+                <div class="small-box bg-success">
+                    <div class="inner">
+
+                        <h3><span id="used_memory_human">--</span></h3>
+                        <p>内存使用量</p>
+                    </div>
+                    <div class="icon">
+                        <i class="ion ion-stats-bars"></i>
+                    </div>
+                </div>
+            </div>
+            <!-- ./col -->
+            <div class="col-lg-3 col-6">
+                <!-- small box -->
+                <div class="small-box bg-warning">
+                    <div class="inner">
+                        <h3><span id="hit_rate"></span><sup style="font-size: 20px">%</sup></h3>
+                        <p>命中率</p>
+                    </div>
+                    <div class="icon">
+                        <i class="ion ion-pie-graph"></i>
+                    </div>
+                </div>
+            </div>
+            <!-- ./col -->
+            <div class="col-lg-3 col-6">
+                <!-- small box -->
+                <div class="small-box bg-danger">
+                    <div class="inner">
+                        <h3><span id="blocked_clients">--</span></h3>
+                        <p>阻塞Clients</p>
+                    </div>
+                    <div class="icon">
+                        <i class="ion ion-person-stalker"></i>
+                    </div>
+                </div>
+            </div>
+            <!-- ./col -->
+        </div>
+        <!-- /.row -->
+        <!-- Main row -->
+        <div class="row">
+            <div id="charts_tps" class="col-xs-6" style="width: 50%;height:400px"></div>
+
+            <div id="charts_clients" class="col-xs-6" style="width: 50%;height:400px"></div>
+        </div>
+        <div class="row">
+            <div id="charts_io" class="col-xs-6" style="width: 100%;height:400px"></div>
+
+        </div>
+        <!-- /.row (main row) -->
+    </div><!-- /.container-fluid -->
+</section>
+<script>var node="[[${node}]]"</script>
+
+<script src='/static/echarts/echarts.min.js'></script>
+<script src='/static/js/sockjs.min.js'></script>
+<script src='/static/js/stomp.min.js'></script>
+<script src='/static/js/monitor.js'></script>
+</body>
+</html>
