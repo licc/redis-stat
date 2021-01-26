@@ -54,8 +54,7 @@ $(function () {
         },
         yAxis: {
             type: 'value',
-            interval: 5,
-
+            minInterval: 1,
             minorSplitLine: {
                 show: true
             },
@@ -85,10 +84,10 @@ $(function () {
                 params.forEach(function (item) {
                     result += '<br/>';
                     result += '<span style="display:inline-block;margin-right:5px;border-radius:10px;width:9px;height:9px;background-color:' + item.color + '"></span>';
-                    result += item.seriesName + "："  + item.value[1];
+                    result += item.seriesName + "：" + item.value[1];
                 });
 
-                return result ;
+                return result;
             },
             axisPointer: {
                 animation: false
@@ -120,6 +119,7 @@ $(function () {
         },
         yAxis: {
             type: 'value',
+            minInterval: 1,
             minorSplitLine: {
                 show: true
             },
@@ -154,10 +154,10 @@ $(function () {
                 params.forEach(function (item) {
                     result += '<br/>';
                     result += '<span style="display:inline-block;margin-right:5px;border-radius:10px;width:9px;height:9px;background-color:' + item.color + '"></span>';
-                    result += item.seriesName + "："  + item.value[1];
+                    result += item.seriesName + "：" + item.value[1];
                 });
 
-                return result ;
+                return result;
             },
             axisPointer: {
                 animation: false
@@ -328,10 +328,8 @@ $(function () {
 
     function initText(data) {
         $("#dbsize").text(data.dbSize);
-        if (data.dbSize > 0) {
-            eval("var " + data.db0);
-            $("#dbsize_expired").text("(临时:" + expires + ")");
-        }
+        $("#dbsize_expired").text("(限时:" + data.limitExpiredKeys + ")");
+
         $("#used_memory_human").text(data.used_memory_human);
         $("#blocked_clients").text(data.blocked_clients);
         var hit_rate = data.keyspace_hits / (parseInt(data.keyspace_hits) + parseInt(data.keyspace_misses));

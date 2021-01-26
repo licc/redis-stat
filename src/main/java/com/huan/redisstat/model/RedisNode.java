@@ -1,10 +1,12 @@
 package com.huan.redisstat.model;
 
+import com.google.common.base.Splitter;
 import com.huan.redisstat.common.MyBeanUtils;
 import com.huan.redisstat.persistence.entities.Node;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
@@ -14,7 +16,9 @@ import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.util.Slowlog;
 
 import java.io.ByteArrayInputStream;
+import java.lang.reflect.Array;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @Author: lihuan
@@ -66,13 +70,17 @@ public class RedisNode {
     }
 
 
+    /**
+     * redis连接
+     * @return
+     */
     public Jedis connect() {
         if (jedisPool == null) {
             JedisPoolConfig poolConfig = new JedisPoolConfig();
-            poolConfig.setMaxTotal(20);
-            poolConfig.setMaxIdle(10);
-            poolConfig.setMinIdle(5);
-            poolConfig.setMaxWaitMillis(1000 * 2);
+            poolConfig.setMaxTotal(2);
+            poolConfig.setMaxIdle(1);
+            poolConfig.setMinIdle(1);
+            poolConfig.setMaxWaitMillis(1000 *1);
             jedisPool = new JedisPool(poolConfig, host, port, 1000);
         }
         Jedis jedis = jedisPool.getResource();
@@ -87,7 +95,9 @@ public class RedisNode {
             String redisInfo = jedis.info();
             Properties redisInfoProperties =
                     PropertiesLoaderUtils.loadProperties(new InputStreamResource(new ByteArrayInputStream(redisInfo.getBytes())));
-            redisInfoProperties.put("dbSize", jedis.dbSize());
+            Map<String, Integer> sumMap=  countDbSize(redisInfoProperties);
+            redisInfoProperties.put("dbSize",sumMap.get("keys") );
+            redisInfoProperties.put("limitExpiredKeys",sumMap.get("expires") );
             role = redisInfoProperties.get("role").toString();
             return redisInfoProperties;
         } catch (Exception e) {
@@ -99,7 +109,39 @@ public class RedisNode {
             }
         }
         return new Properties();
+    }
 
+    /**
+     * 统计key总数
+     * @param properties
+     * @return
+     */
+    private Map<String, Integer> countDbSize(Properties properties) {
+
+        Map<String, Integer> sumMap =
+                properties.entrySet().stream()
+                        .filter(item -> String.valueOf(item.getKey()).indexOf("db") == 0)
+                        .map(item -> split2MapAndGet(String.valueOf(item.getValue())))
+                        .flatMap(m -> m.entrySet().stream())
+                        .collect(Collectors.groupingBy(Map.Entry::getKey,
+                                Collectors.summingInt(Map.Entry::getValue)
+                        ));
+//        Collectors.mapping(Map.Entry::getValue, Collectors.toList())
+//        Collectors.summingInt(item->item.values().
+
+        return sumMap;
+    }
+
+
+    /**
+     * 键值对对解析
+     * @param in
+     * @return
+     */
+    private Map<String, Integer> split2MapAndGet(String in) {
+        return Splitter.on(",").withKeyValueSeparator("=").split(in).entrySet().stream()
+                .filter(item -> ArrayUtils.contains(new String[]{"keys", "expires"}, item.getKey()))
+                .collect(Collectors.toMap(item -> item.getKey(), item -> Integer.parseInt(item.getValue())));
     }
 
     public Map<String, Object> configs() {
