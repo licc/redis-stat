@@ -51,6 +51,20 @@ public class RedisNode {
 
     private JedisPool jedisPool;
 
+
+    /**
+     * redis与系统时间差
+     */
+    private long sysDiffSeconds = 0;
+
+    /**
+     * 上次执行时间
+     */
+    private long lastSeconds = 0;
+
+
+    private Map<String, Double> oldCpuUseMap = new HashMap<>();
+
     public RedisNode() {
     }
 
@@ -72,6 +86,7 @@ public class RedisNode {
 
     /**
      * redis连接
+     *
      * @return
      */
     public Jedis connect() {
@@ -80,25 +95,49 @@ public class RedisNode {
             poolConfig.setMaxTotal(2);
             poolConfig.setMaxIdle(1);
             poolConfig.setMinIdle(1);
-            poolConfig.setMaxWaitMillis(1000 *1);
+            poolConfig.setMaxWaitMillis(1000 * 1);
             jedisPool = new JedisPool(poolConfig, host, port, 1000);
         }
         Jedis jedis = jedisPool.getResource();
         return jedis;
     }
 
+    /**
+     * 节点数据初始化
+     */
+    public synchronized void init() {
+        if (sysDiffSeconds == 0) {
+            Properties properties = info();
+            long nowSeconds = Long.parseLong(StringUtils.defaultString(properties.getProperty("uptime_in_seconds"),
+                    "0"));
+            sysDiffSeconds = (System.currentTimeMillis() / 1000) - nowSeconds;
+            role = properties.get("role").toString();
+        }
+    }
+
     public Properties info() {
         Jedis jedis = null;
-
         try {
             jedis = connect();
             String redisInfo = jedis.info();
             Properties redisInfoProperties =
                     PropertiesLoaderUtils.loadProperties(new InputStreamResource(new ByteArrayInputStream(redisInfo.getBytes())));
-            Map<String, Integer> sumMap=  countDbSize(redisInfoProperties);
-            redisInfoProperties.put("dbSize",sumMap.get("keys") );
-            redisInfoProperties.put("limitExpiredKeys",sumMap.get("expires") );
-            role = redisInfoProperties.get("role").toString();
+            Map<String, Integer> sumMap = countDbSize(redisInfoProperties);
+            redisInfoProperties.put("dbSize", sumMap.get("keys"));
+            redisInfoProperties.put("limitExpiredKeys", sumMap.get("expires"));
+
+            long nowSeconds = Integer.valueOf(redisInfoProperties.getProperty("uptime_in_seconds"));
+            redisInfoProperties.put("used_cpu_sys_rate", calculate("used_cpu_sys_rate",
+                    redisInfoProperties.getProperty("used_cpu_sys"), nowSeconds));
+            redisInfoProperties.put("used_cpu_user_rate", calculate("used_cpu_user_rate",
+                    redisInfoProperties.getProperty("used_cpu_user"), nowSeconds));
+            redisInfoProperties.put("used_cpu_sys_children_rate", calculate("used_cpu_sys_children_rate",
+                    redisInfoProperties.getProperty("used_cpu_sys_children"), nowSeconds));
+            redisInfoProperties.put("used_cpu_user_children_rate", calculate("used_cpu_user_children_rate",
+                    redisInfoProperties.getProperty("used_cpu_user_children"), nowSeconds));
+            redisInfoProperties.put("sysTime", (sysDiffSeconds + nowSeconds));
+            lastSeconds = nowSeconds;
+
             return redisInfoProperties;
         } catch (Exception e) {
             log.error("获取 redis  host:{} port:{} info 失败", host, port, e);
@@ -112,7 +151,50 @@ public class RedisNode {
     }
 
     /**
+     * 计算cpu平均使用率
+     *
+     * @param cpuTime
+     * @param nowSeconds
+     * @return
+     */
+    private String calculate(String key, String cpuTime, long nowSeconds) {
+        double currUse = Double.valueOf(cpuTime);
+        //第一次之后
+        if (oldCpuUseMap.containsKey(key)) {
+
+            double diffCpuTime = currUse - oldCpuUseMap.get(key);
+
+            long diffSeconds = nowSeconds - lastSeconds;
+
+            double cpuLoad = (nowSeconds > 0 && diffCpuTime > 0) ? (diffCpuTime / diffSeconds) : 0;
+
+            if (diffCpuTime > 0) {
+
+                log.debug("key:{}  cpuTime:{} oldTime:{} diffSeconds:{} diffCpuTime:{}  nowSeconds:{} cpuLoad:{}%",
+                        key,
+                        cpuTime,
+                        oldCpuUseMap.get(key),
+                        diffSeconds,
+                        diffCpuTime,
+                        nowSeconds,
+                        cpuLoad);
+            }
+            oldCpuUseMap.put(key, currUse);
+
+            return String.valueOf(cpuLoad);
+        } else {
+
+            oldCpuUseMap.put(key, currUse);
+            return "";
+        }
+
+
+    }
+
+
+    /**
      * 统计key总数
+     *
      * @param properties
      * @return
      */
@@ -135,6 +217,7 @@ public class RedisNode {
 
     /**
      * 键值对对解析
+     *
      * @param in
      * @return
      */

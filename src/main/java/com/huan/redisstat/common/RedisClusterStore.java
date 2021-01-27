@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
- *
+ *redis仓库
  */
 @Slf4j
 public class RedisClusterStore {
@@ -35,6 +35,7 @@ public class RedisClusterStore {
                             map(node -> {
                                 RedisNode redisNode = RedisNode.translateFromNode(node);
                                 nodeMapping.put(node.getHost() + ":" + node.getPort(), redisNode);
+                                redisNode.init();
                                 return redisNode;
                             }).collect(Collectors.toList())));
 
@@ -49,6 +50,7 @@ public class RedisClusterStore {
                         map(node -> {
                             RedisNode redisNode = RedisNode.translateFromNode(node);
                             nodeMapping.put(node.getHost() + ":" + node.getPort(), redisNode);
+                            redisNode.init();
                             return redisNode;
                         }).collect(Collectors.toList())));
 
