@@ -134,8 +134,6 @@ $(function () {
     };
 
 
-
-
     setInterval(function () {
             onDataRefresh()
         }
@@ -163,6 +161,7 @@ $(function () {
             series: [{
                 type: 'line',
                 name: 'TPS',
+                showSymbol: false,
 
                 data: charts_tps
             }]
@@ -180,12 +179,15 @@ $(function () {
             series: [{
                 name: '连接Client',
                 type: 'line',
+                showSymbol: false,
 
                 data: charts_clients
             }
                 , {
                     name: '阻塞Client',
                     type: 'line',
+                    showSymbol: false,
+
                     data: charts_blocked_clients
                 }
             ]
@@ -193,29 +195,34 @@ $(function () {
 
         charts_io_chart.setOption({
             legend: {
-                data: ['input_kbps', 'output_kbps']
+                data: ['output_kbps', 'input_kbps']
             },
 
             title: {
                 text: '网络流量'
             },
 
-            series: [{
-                name: 'input_kbps',
-                type: 'line',
-
-                data: input_kbps
-            }
-                , {
+            series: [
+                {
                     name: 'output_kbps',
                     type: 'line',
+                    areaStyle: {},
+                    showSymbol: false,
+
                     data: output_kbps
+                }, {
+                    name: 'input_kbps',
+                    type: 'line',
+                    areaStyle: {},
+                    showSymbol: false,
+
+                    data: input_kbps
                 }
             ]
         });
         charts_cpu_chart.setOption({
             legend: {
-                data: ['系统CPU', '用户CPU','进程CPU(sys)','进程CPU(usr)']
+                data: ['系统CPU', '用户CPU', '进程CPU(sys)', '进程CPU(usr)']
             },
 
             title: {
@@ -225,22 +232,29 @@ $(function () {
             series: [{
                 name: '系统CPU',
                 type: 'line',
+                showSymbol: false,
 
                 data: cpu_sys_children
             }
                 , {
                     name: '用户CPU',
                     type: 'line',
+                    showSymbol: false,
+
                     data: cpu_usr_children
                 }
                 , {
                     name: '进程CPU(sys)',
                     type: 'line',
+                    showSymbol: false,
+
                     data: cpu_sys_main_thr
                 }
                 , {
                     name: '进程CPU(usr)',
                     type: 'line',
+                    showSymbol: false,
+
                     data: cpu_usr_main_thr
                 }
             ]
@@ -251,11 +265,12 @@ $(function () {
 
     var stompClient = null;
 
-
     function connect() {
 
         var socket = new SockJS('/ws');
         stompClient = Stomp.over(socket);
+        stompClient.heartbeat.outgoing = 20000;
+        stompClient.heartbeat.incoming = 0; //客户端不从服务端接收心跳包
         var headers = {
             node: node,
         };
@@ -268,21 +283,25 @@ $(function () {
 
     function onConnected() {
         stompClient.subscribe('/topic/' + node, onMessageReceived);
-
     }
 
     function onError(error) {
-        console.log(error)
+        console.log("onError重连",error)
+        //重连
+        setTimeout(function () {
+            connect();
+        }, 5000)
+
     }
 
-    function dataFormat(value,timeStr,type) {
-        var n= type==2? parseFloat(value).toFixed(2): parseInt(value ? value : '0');
-        now = new Date(parseInt(timeStr)*1000);
+    function dataFormat(value, timeStr, type) {
+        var n = type == 2 ? parseFloat(value).toFixed(2) : parseInt(value ? value : '0');
+        now = new Date(parseInt(timeStr) * 1000);
         nowStr = echarts.format.formatTime('yyyy-MM-dd hh:mm:ss', now, false);
         return {
             name: nowStr,
             value: [
-                nowStr,n
+                nowStr, n
             ]
         }
     }
@@ -301,19 +320,18 @@ $(function () {
         var message = JSON.parse(payload.body);
         var data = message.data;
 
-        charts_tps.push(dataFormat(data.instantaneous_ops_per_sec,data.sysTime));
-        charts_clients.push(dataFormat(data.connected_clients,data.sysTime));
-        charts_blocked_clients.push(dataFormat(data.blocked_clients,data.sysTime));
-        input_kbps.push(dataFormat(data.instantaneous_input_kbps,data.sysTime,2));
-        output_kbps.push(dataFormat(data.instantaneous_output_kbps,data.sysTime,2));
-        cpu_sys_children.push(dataFormat(data.used_cpu_sys_rate,data.sysTime,2));
-        cpu_usr_children.push(dataFormat(data.used_cpu_user_rate,data.sysTime,2));
-        cpu_sys_main_thr.push(dataFormat(data.used_cpu_sys_children_rate,data.sysTime,2));
-        cpu_usr_main_thr.push(dataFormat(data.used_cpu_user_children_rate,data.sysTime,2));
+        charts_tps.push(dataFormat(data.instantaneous_ops_per_sec, data.sysTime));
+        charts_clients.push(dataFormat(data.connected_clients, data.sysTime));
+        charts_blocked_clients.push(dataFormat(data.blocked_clients, data.sysTime));
+        input_kbps.push(dataFormat(data.instantaneous_input_kbps, data.sysTime, 2));
+        output_kbps.push(dataFormat(data.instantaneous_output_kbps, data.sysTime, 2));
+        cpu_sys_children.push(dataFormat(data.used_cpu_sys_rate, data.sysTime, 2));
+        cpu_usr_children.push(dataFormat(data.used_cpu_user_rate, data.sysTime, 2));
+        cpu_sys_main_thr.push(dataFormat(data.used_cpu_sys_children_rate, data.sysTime, 2));
+        cpu_usr_main_thr.push(dataFormat(data.used_cpu_user_children_rate, data.sysTime, 2));
 
         initText(data);
 
-        // onDataRefresh();
     }
 
     connect();

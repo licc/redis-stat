@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
@@ -16,7 +17,6 @@ import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.util.Slowlog;
 
 import java.io.ByteArrayInputStream;
-import java.lang.reflect.Array;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -111,10 +111,9 @@ public class RedisNode {
             long nowSeconds = Long.parseLong(StringUtils.defaultString(properties.getProperty("uptime_in_seconds"),
                     "0"));
             sysDiffSeconds = (System.currentTimeMillis() / 1000) - nowSeconds;
-            role = properties.get("role").toString();
+            role = ObjectUtils.defaultIfNull(properties.get("role"),"").toString();
         }
     }
-
     public Properties info() {
         Jedis jedis = null;
         try {
@@ -283,3 +282,4 @@ public class RedisNode {
     }
 
 }
+
