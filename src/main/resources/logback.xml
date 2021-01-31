@@ -50,7 +50,7 @@
         <appender-ref ref="ASYNC_FILE"/>
     </root>
     <!-- logger可选节点：单独配置某个"包"或者"某个类"下面的日志等级。 不受 root 影响-->
-    <logger name="com.ofpay.redisstat" level="INFO" additivity="false">
+    <logger name="com.huan.redisstat" level="INFO" additivity="false">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="ASYNC_FILE"/>
     </logger>
