@@ -2,7 +2,6 @@ package com.huan.redisstat.common;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +12,6 @@ import java.util.List;
  */
 @Getter
 @Setter
-@ToString
 public class NavNode {
     /**
      * 导航节点类型：一级导航
@@ -60,12 +58,18 @@ public class NavNode {
     }
 
 
-    //是否有子节点
+    /**
+     * 是否有子节点
+     * @return
+     */
     public boolean hasChild() {
         return children.size() > 0;
     }
 
-    //是否有一级导航类别（type=NAV_NODE_TYPE_TOP_NAV）的子节点
+    /**
+     * 是否有一级导航类别（type=NAV_NODE_TYPE_TOP_NAV）的子节点
+     * @return
+     */
     public boolean hasTopNavChild() {
         for (NavNode navNode : this.children) {
             if (navNode.getType() == NAV_NODE_TYPE_TOP_NAV) {
@@ -75,7 +79,10 @@ public class NavNode {
         return false;
     }
 
-    //获取一级导航类别（type=NAV_NODE_TYPE_TOP_NAV）的子节点
+    /**
+     * 获取一级导航类别（type=NAV_NODE_TYPE_TOP_NAV）的子节点
+     * @return
+     */
     public List<NavNode> getTopNavChildren() {
         List<NavNode> topNavNodes = new ArrayList<>();
         for (NavNode navNode : this.children) {
