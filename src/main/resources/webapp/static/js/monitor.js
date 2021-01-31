@@ -262,37 +262,26 @@ $(function () {
 
     }
 
-
-    var stompClient = null;
-
-    function connect() {
-
-        var socket = new SockJS('/ws');
-        stompClient = Stomp.over(socket);
-        stompClient.heartbeat.outgoing = 20000;
-        stompClient.heartbeat.incoming = 0; //客户端不从服务端接收心跳包
-        var headers = {
-            node: node,
-        };
-        stompClient.connect(headers, onConnected, onError);
-        stompClient.debug = null
-
-
-    }
-
-
-    function onConnected() {
+    var headers = {
+        node: node,
+    };
+    var stompClient = new StompJs.Client({
+        brokerURL: 'ws://' + window.location.host + '/ws',
+        connectHeaders: headers,
+        reconnectDelay: 5000,
+        heartbeatIncoming: 4000,
+        heartbeatOutgoing: 4000,
+    });
+    stompClient.onConnect = function () {
         stompClient.subscribe('/topic/' + node, onMessageReceived);
     }
 
-    function onError(error) {
-        console.log("onError重连",error)
-        //重连
-        setTimeout(function () {
-            connect();
-        }, 5000)
+    stompClient.onStompError = function (error) {
+        console.log("onError", error)
 
-    }
+    };
+
+    stompClient.activate();
 
     function dataFormat(value, timeStr, type) {
         var n = type == 2 ? parseFloat(value).toFixed(2) : parseInt(value ? value : '0');
@@ -334,7 +323,7 @@ $(function () {
 
     }
 
-    connect();
+    // connect();
 
     charts_tps_chart.setOption(optionClients);
     charts_clients_chart.setOption(optionClients);

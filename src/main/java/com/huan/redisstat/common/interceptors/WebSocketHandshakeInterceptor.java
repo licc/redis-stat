@@ -1,5 +1,6 @@
 package com.huan.redisstat.common.interceptors;
 
+import org.apache.catalina.session.StandardSession;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.http.server.ServletServerHttpRequest;
@@ -19,6 +20,7 @@ public class WebSocketHandshakeInterceptor implements HandshakeInterceptor {
             , Map<String, Object> attributes) throws Exception {
 
         if (request instanceof ServletServerHttpRequest) {
+
         }
         return true;
     }
@@ -26,8 +28,11 @@ public class WebSocketHandshakeInterceptor implements HandshakeInterceptor {
     @Override
     public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler,
                                Exception exception) {
-
         if (request instanceof ServletServerHttpRequest) {
+
+            ServletServerHttpRequest servletRequest = (ServletServerHttpRequest) request;
+            StandardSession session = (StandardSession)servletRequest.getServletRequest().getSession();
+            session.access();
         }
     }
 }

@@ -16,7 +16,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 @SpringBootApplication(exclude = MybatisAutoConfiguration.class)
 public class RedisStatApplication {
 	static {
-		System.setProperty("spring.config.name","application,jdbc,config,log4j");
+		System.setProperty("spring.config.name","application,jdbc,config");
 	}
 	public static void main(String[] args) {
 		SpringApplication.run(RedisStatApplication.class, args);

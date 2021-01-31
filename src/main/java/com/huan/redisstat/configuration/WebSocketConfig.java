@@ -2,7 +2,6 @@ package com.huan.redisstat.configuration;
 
 import com.huan.redisstat.common.RedisClusterStore;
 import com.huan.redisstat.common.interceptors.WebSocketHandshakeInterceptor;
-import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -21,14 +20,16 @@ import java.util.Map;
 /**
  * websocket 配置及监听
  */
+@SuppressWarnings("AliDeprecation")
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
+
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws").addInterceptors(new WebSocketHandshakeInterceptor())
-                .setAllowedOrigins("*").withSockJS();
+                .setAllowedOrigins("*");
     }
 
     @Override
@@ -53,13 +54,14 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
      *
      * @param event
      */
+    @SuppressWarnings("AliDeprecation")
     @EventListener
     public void onConnectedEvent(SessionConnectedEvent event) {
         GenericMessage<byte[]> message = (GenericMessage<byte[]>) event.getMessage();
         GenericMessage simpConnectMessage = (GenericMessage) message.getHeaders().get("simpConnectMessage");
         List<String> nodeList = (List) ((Map) simpConnectMessage.getHeaders().get("nativeHeaders")).get("node");
         String node = nodeList.stream().findFirst().get();
-        String simpSessionId = ObjectUtils.toString(message.getHeaders().get("simpSessionId"));
+        String simpSessionId = String.valueOf(message.getHeaders().get("simpSessionId"));
         RedisClusterStore.addActiveNodeClient(node, simpSessionId);
     }
 

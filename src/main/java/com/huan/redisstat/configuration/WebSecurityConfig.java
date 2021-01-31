@@ -1,22 +1,24 @@
 package com.huan.redisstat.configuration;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-//    @Override
-//    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-//
-//        auth.inMemoryAuthentication().withUser("admin").password("123456")
-//                .roles("ADMIN").and().passwordEncoder(new MyPasswordEncoder());
-//    }
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new MyPasswordEncoder();
+    }
+
+
     @Override
     public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers("/static/**","/h2/**");
+        web.ignoring().antMatchers("/static/**", "/h2/**");
     }
 
 

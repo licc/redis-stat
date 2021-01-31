@@ -79,24 +79,23 @@
         <!-- /.row -->
         <!-- Main row -->
         <div class="row">
-            <div id="charts_tps" class="col-xs-6" style="width: 50%;height:400px"></div>
+            <div id="charts_tps" class="col-xs-6 charts-div"></div>
 
-            <div id="charts_clients" class="col-xs-6" style="width: 50%;height:400px"></div>
+            <div id="charts_clients" class="col-xs-6 charts-div"></div>
         </div>
         <div class="row">
-            <div id="charts_io" class="col-xs-6" style="width: 50%;height:400px"></div>
+            <div id="charts_io" class="col-xs-6 charts-div"></div>
 
-            <div id="charts_cpu" class="col-xs-6" style="width: 50%;height:400px"></div>
+            <div id="charts_cpu" class="col-xs-6 charts-div"></div>
 
         </div>
         <!-- /.row (main row) -->
     </div><!-- /.container-fluid -->
 </section>
-<script>var node="[[${node}]]"</script>
+<script>var node = "[[${node}]]"</script>
 
 <script src='/static/echarts/echarts.min.js'></script>
-<script src='/static/js/sockjs.min.js'></script>
-<script src='/static/js/stomp.min.js'></script>
+<script src='/static/js/stomp.umd.min.js'></script>
 <script src='/static/js/monitor.js'></script>
 </body>
 </html>
