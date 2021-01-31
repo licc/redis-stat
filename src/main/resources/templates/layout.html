@@ -97,7 +97,7 @@
 			<li class="nav-item dropdown user-menu">
 				<a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
 					<img src="/static/AdminLTE-3.1.0-rc/dist/img/user2-160x160.jpg" class="user-image img-circle elevation-2" alt="User Image">
-					<span class="d-none d-md-inline">Admin</span>
+					<span class="d-none d-md-inline" >[[${currUser.username}]]</span>
 				</a>
 				<ul class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
 					<!-- User image -->
@@ -105,7 +105,7 @@
 						<img src="/static/AdminLTE-3.1.0-rc/dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
 
 						<p>
-							Admin
+							[[${currUser.username}]]
 							<small id="login_time"></small>
 						</p>
 					</li>
@@ -137,7 +137,7 @@
 					<img src="/static/AdminLTE-3.1.0-rc/dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
 				</div>
 				<div class="info">
-					<a href="#" class="d-block">Admin </a>
+					<a href="#" class="d-block">[[${currUser.username}]] </a>
 				</div>
 			</div>
 

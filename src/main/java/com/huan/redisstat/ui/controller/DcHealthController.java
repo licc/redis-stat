@@ -1,8 +1,8 @@
 package com.huan.redisstat.ui.controller;
 
 import com.huan.redisstat.common.RedisClusterStore;
+import com.huan.redisstat.common.SpringContext;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,9 +22,6 @@ import java.io.IOException;
 @Controller
 @RequestMapping("/")
 public class DcHealthController {
-    @Autowired
-    private ThreadPoolTaskScheduler threadPoolTaskScheduler;
-
 
     @RequestMapping(value = "/HealthServlet/check")
     @ResponseBody
@@ -46,16 +43,22 @@ public class DcHealthController {
     }
 
     public void stopSpringTask() {
-        log.info("开始停止spring-task的线程池ActiveCount:{} ...", threadPoolTaskScheduler.getActiveCount());
-        threadPoolTaskScheduler.setWaitForTasksToCompleteOnShutdown(true);
-        threadPoolTaskScheduler.shutdown();
-        while (threadPoolTaskScheduler.getActiveCount() != 0) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                log.error("停止线程池失败");
+
+        SpringContext.getApplicationContext().getBeansOfType(ThreadPoolTaskScheduler.class)
+                .values().stream().forEach(threadPoolTaskScheduler -> {
+            log.info("开始停止spring-task的线程池ActiveCount:{} ...", threadPoolTaskScheduler.getActiveCount());
+            threadPoolTaskScheduler.setWaitForTasksToCompleteOnShutdown(true);
+            threadPoolTaskScheduler.shutdown();
+            while (threadPoolTaskScheduler.getActiveCount() != 0) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    log.error("停止线程池失败");
+                }
             }
-        }
+        });
+
+
         log.info("停止spring-task的线程池成功");
     }
 }
